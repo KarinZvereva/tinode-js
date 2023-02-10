@@ -14,7 +14,7 @@
   "browserslist": "> 0.5%, not IE 11, not op_mini all, not and_uc >0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tinode/tinode-js.git"
+    "url": "git+https://github.com/KarinZvereva/tinode-js.git"
   },
   "files": [
     "umd/tinode.dev.js",

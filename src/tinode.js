@@ -631,12 +631,24 @@ const Tinode = function(config, onComplete) {
         onComplete();
       }
       this.logger("Persistent cache initialized.");
+    }).catch((err) => {
+      if (onComplete) {
+        onComplete(err);
+      }
+      this.logger("Failed to initialize persistent cache:", err);
+      throw new Error("Failed to initialize persistent cache: " + err);
     });
   } else {
     this._db.deleteDatabase().then(() => {
       if (onComplete) {
         onComplete();
       }
+    }).catch((err) => {
+      if (onComplete) {
+        onComplete(err);
+      }
+      this.logger("Failed to delete persistent cache:", err);
+      throw new Error("Failed to delete persistent cache: " + err);
     });
   }
 
