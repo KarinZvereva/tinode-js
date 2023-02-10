@@ -636,7 +636,8 @@ const Tinode = function(config, onComplete) {
         onComplete(err);
       }
       this.logger("Failed to initialize persistent cache:", err);
-      throw new Error("Failed to initialize persistent cache: " + err);
+      const msg = typeof err === 'string' ? err : JSON.stringify(err);
+      throw new Error("Failed to initialize persistent cache: " + msg);
     });
   } else {
     this._db.deleteDatabase().then(() => {
@@ -648,7 +649,8 @@ const Tinode = function(config, onComplete) {
         onComplete(err);
       }
       this.logger("Failed to delete persistent cache:", err);
-      throw new Error("Failed to delete persistent cache: " + err);
+      const msg = typeof err === 'string' ? err : JSON.stringify(err);
+      throw new Error("Failed to delete persistent cache: " + msg);
     });
   }
 
