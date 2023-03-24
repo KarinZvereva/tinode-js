@@ -25,7 +25,7 @@ const DB = function(onError, logger) {
   // Instance of IndexDB.
   let db = null;
   // Indicator that the cache is disabled.
-  let disabled = false;
+  let disabled = true;
 
   // Serializable topic fields.
   const topic_fields = ['created', 'updated', 'deleted', 'read', 'recv', 'seq', 'clear', 'defacs',

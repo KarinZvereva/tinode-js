@@ -633,11 +633,9 @@ const Tinode = function(config, onComplete) {
       this.logger("Persistent cache initialized.");
     });
   } else {
-    this._db.deleteDatabase().then(() => {
-      if (onComplete) {
-        onComplete();
-      }
-    });
+    if (onComplete) {
+      onComplete();
+    }
   }
 
   // Resolve or reject a pending promise.
