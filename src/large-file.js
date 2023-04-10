@@ -145,9 +145,9 @@ LargeFileHelper.prototype = {
     try {
       const form = new FormData();
       form.append('file', data);
-      form.set('id', this._reqId);
+      form.append('id', this._reqId);
       if (avatarFor) {
-        form.set('topic', avatarFor);
+        form.append('topic', avatarFor);
       }
       this.xhr.send(form);
     } catch (err) {
