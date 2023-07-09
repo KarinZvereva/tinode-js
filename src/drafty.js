@@ -49,7 +49,8 @@
  *         { "tp":"LN", "data":{ "url":"http://www.tinode.co" } },
  *         { "tp":"MN", "data":{ "val":"mention" } },
  *         { "tp":"HT", "data":{ "val":"hashtag" } }
- *     ]
+ *     ],
+ *     "attachments": [{"ref": "/image.png", "height": 100, "width": 100, "name": "image.png", "mime": "image/png", "duration": 0}],
  *  }
  */
 
@@ -63,7 +64,7 @@ const MAX_FORM_ELEMENTS = 8;
 const MAX_PREVIEW_ATTACHMENTS = 3;
 const MAX_PREVIEW_DATA_SIZE = 64;
 const JSON_MIME_TYPE = 'application/json';
-const DRAFTY_MIME_TYPE = 'text/x-drafty';
+const DRAFTY_MIME_TYPE = 'text/x-drafty-v2';
 const ALLOWED_ENT_FIELDS = ['act', 'height', 'mime', 'name', 'ref', 'size', 'url', 'val', 'width'];
 
 // Regular expressions for parsing inline formats. Javascript does not support lookbehind,
@@ -437,6 +438,7 @@ const Drafty = function() {
   this.txt = '';
   this.fmt = [];
   this.ent = [];
+  this.attachments = [];
 }
 
 /**
@@ -714,6 +716,72 @@ Drafty.insertImage = function(content, at, imageDesc) {
   }
 
   content.ent.push(ex);
+
+  return content;
+}
+
+/**
+ * @typedef Drafty.AttachmentDesc
+ * @memberof Drafty
+ * @type Object
+ * @param {string} mime - mime-type of the image/video, e.g. "image/png"
+ * @param {string} preview - base64-encoded image content (or preview, if large image is attached). Could be null/undefined.
+ * @param {integer} width - width of the image/video
+ * @param {integer} height - height of the image/video
+ * @param {string} filename - file name suggestion for downloading the image/video.
+ * @param {integer} size - size of the image/video in bytes. Treat is as an untrusted hint.
+ * @param {string} refurl - reference to the content. Could be null/undefined.
+ * @param {string} duration - duration of the video
+ * @param {string} _tempPreview - base64-encoded image preview used during upload process; not serializable.
+ * @param {Promise} urlPromise - Promise which returns content URL when resolved.
+ */
+
+/**
+ * Insert attachment into Drafty document (out of tree).
+ * @memberof Drafty
+ * @static
+ *
+ * @param {Drafty} content - document to add attachemnt to.
+ * @param {AttachmenteDesc} attachmentDesc - object with image/video paramenets and data.
+ *
+ * @return {Drafty} updated document.
+ */
+Drafty.insertAttachment = function(content, attachmentDesc) {
+  content = content || {
+    txt: ' '
+  };
+  content.ent = content.ent || [];
+  content.fmt = content.fmt || [];
+  content.attachments = content.attachments || [];
+
+  const ex = {
+    mime: attachmentDesc.mime,
+    val: attachmentDesc.preview,
+    width: attachmentDesc.width,
+    height: attachmentDesc.height,
+    name: attachmentDesc.filename,
+    size: attachmentDesc.size | 0,
+    duration: attachmentDesc.duration | 0,
+    ref: attachmentDesc.refurl
+  };
+
+  if (attachmentDesc.urlPromise) {
+    ex._tempPreview = attachmentDesc._tempPreview;
+    ex._processing = true;
+    attachmentDesc.urlPromise.then(
+        (url) => {
+          ex.ref = url;
+          ex._tempPreview = undefined;
+          ex._processing = undefined;
+        },
+        (err) => {
+          /* catch the error, otherwise it will appear in the console. */
+          ex._processing = undefined;
+        }
+    );
+  }
+
+  content.attachments.push(ex);
 
   return content;
 }
@@ -1328,15 +1396,15 @@ Drafty.isValid = function(content) {
 }
 
 /**
- * Check if the drafty document has attachments: style EX and outside of normal rendering flow,
+ * Check if the drafty document has files: style EX and outside of normal rendering flow,
  * i.e. <code>at = -1</code>.
  * @memberof Drafty
  * @static
  *
- * @param {Drafty} content - document to check for attachments.
- * @returns <code>true</code> if there are attachments.
+ * @param {Drafty} content - document to check for files.
+ * @returns <code>true</code> if there are files.
  */
-Drafty.hasAttachments = function(content) {
+Drafty.hasFiles = function(content) {
   if (!Array.isArray(content.fmt)) {
     return false;
   }
@@ -1348,6 +1416,18 @@ Drafty.hasAttachments = function(content) {
     }
   }
   return false;
+}
+
+/**
+ * Check if the drafty document has attachments
+ * @memberof Drafty
+ * @static
+ *
+ * @param {Drafty} content - document to check for attachments.
+ * @returns <code>true</code> if there are attachments.
+ */
+Drafty.hasAttachments = function(content) {
+  return content && content.attachments && content.attachments.length > 0;
 }
 
 /**
@@ -1363,15 +1443,15 @@ Drafty.hasAttachments = function(content) {
  */
 
 /**
- * Enumerate attachments: style EX and outside of normal rendering flow, i.e. <code>at = -1</code>.
+ * Enumerate files: style EX and outside of normal rendering flow, i.e. <code>at = -1</code>.
  * @memberof Drafty
  * @static
  *
- * @param {Drafty} content - document to process for attachments.
- * @param {EntityCallback} callback - callback to call for each attachment.
+ * @param {Drafty} content - document to process for files.
+ * @param {EntityCallback} callback - callback to call for each file.
  * @param {Object} context - value of "this" for callback.
  */
-Drafty.attachments = function(content, callback, context) {
+Drafty.files = function(content, callback, context) {
   if (!Array.isArray(content.fmt)) {
     return;
   }
@@ -1385,6 +1465,26 @@ Drafty.attachments = function(content, callback, context) {
     }
   });
 }
+
+/**
+ * Enumerate attachments.
+ * @memberof Drafty
+ * @static
+ *
+ * @param {Drafty} content - document with attachments to enumerate.
+ * @param {EntityCallback} callback - callback to call for each attachment.
+ * @param {Object} context - value of "this" for callback.
+ */
+Drafty.attachments = function(content, callback, context) {
+  if (content.attachments && content.attachments.length > 0) {
+    for (let i in content.attachments) {
+      if (content.attachments[i]) {
+        callback.call(context, content.attachments[i], i);
+      }
+    }
+  }
+}
+
 
 /**
  * Check if the drafty document has entities.
@@ -1551,7 +1651,7 @@ Drafty.attrValue = function(style, data) {
  * @memberof Drafty
  * @static
  *
- * @returns {string} content-Type "text/x-drafty".
+ * @returns {string} content-Type "text/x-drafty-v2".
  */
 Drafty.getContentType = function() {
   return DRAFTY_MIME_TYPE;

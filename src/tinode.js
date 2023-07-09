@@ -2577,7 +2577,7 @@ Topic.prototype = {
     }
 
     // Extract refereces to attachments and out of band image records.
-    let attachments = null;
+    let attachments = [];
     if (Drafty.hasEntities(pub.content)) {
       attachments = [];
       Drafty.entities(pub.content, (data) => {
@@ -2585,9 +2585,18 @@ Topic.prototype = {
           attachments.push(data.ref);
         }
       });
-      if (attachments.length == 0) {
-        attachments = null;
-      }
+    }
+
+    if (Drafty.hasAttachments(pub.content)) {
+      Drafty.attachments(pub.content, (data) => {
+        if (data && data.ref) {
+          attachments.push(data.ref);
+        }
+      });
+    }
+
+    if (attachments.length === 0) {
+      attachments = null;
     }
 
     // Send data.
