@@ -1223,6 +1223,11 @@ Drafty.replyContent = function(original, limit) {
       node.text = ' ';
       delete node.type;
       delete node.children;
+    } else if (node.type == 'IM') {
+      // Remove inline images
+      if (!node.parent || !node.parent.type) {
+        return null;
+      }
     }
     return node;
   }
