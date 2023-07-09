@@ -644,6 +644,10 @@ Drafty.append = function(first, second) {
     });
   }
 
+  if (typeof second !== 'string' && Array.isArray(second.attachments)) {
+    first.attachments = second.attachments;
+  }
+
   return first;
 }
 
@@ -1218,14 +1222,27 @@ Drafty.forwardedContent = function(original) {
         return null;
       }
     }
+    if (node.type == 'IM') {
+      if (!node.parent || !node.parent.type) {
+        return null;
+      }
+    }
     return node;
   }
   // Strip leading mention.
   tree = treeTopDown(tree, rmMention);
   // Remove leading whitespace.
   tree = lTrim(tree);
+
+  const doc = {};
+
+  // save attachments from original
+  if (typeof original !== 'string' && Array.isArray(original.attachments)) {
+    doc.attachments = original.attachments;
+  }
+
   // Convert back to Drafty.
-  return treeToDrafty({}, tree, []);
+  return treeToDrafty(doc, tree, []);
 }
 
 /**

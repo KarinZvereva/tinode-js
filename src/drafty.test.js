@@ -291,7 +291,18 @@ const shorten_this = [
       "txt": "😀 b1👩🏽‍✈️b2 smile 123 1…",
       "fmt":[{"tp":"ST","at":2,"len":8},{"tp":"EM","at":0,"len":15}]
     },
-  ]
+  ],
+  [
+    {
+      "txt":"Message with new attachment",
+      "fmt":[{"at":0,"len":8,"tp":"EM"},{"at":17,"len":10,"tp":"ST"}],
+      "attachments": [{"mime":"image/jpeg","val":"<1292, bytes: /9j/4AAQSkZJ123456789012345678901234567890123456789012345678901234567890rehH5o6D/9k=>","width":25,"height":14,"size":968}]
+    },
+    {
+      "txt":"Message with n…",
+      "fmt":[{"tp":"EM","at":0,"len":8}]
+    },
+  ],
 ];
 
 test.each(shorten_this)('Drafty.shorten %j', (src,exp) => {
@@ -372,6 +383,47 @@ const forward_this = [
       "txt":"Alice Johnson This is a simple replyThis is a reply to reply"
     }
   ],
+  [{
+    "txt": "Message with new attachment",
+    "fmt":[{"at":0,"len":8,"tp":"EM"},{"at":17,"len":10,"tp":"ST"}],
+    "attachments": [
+      {
+        "height": 213,
+        "mime": "image/jpeg",
+        "name": "roses.jpg",
+        "val": "<38992, bytes: 123456789012345678901234567890123456789012345678901234567890>",
+        "width": 638
+      },
+      {
+        "height": 213,
+        "mime": "image1/jpeg",
+        "name": "roses.jpg",
+        "val": "<38992, bytes: 123456789012345678901234567890123456789012345678901234567890>",
+        "width": 638
+      }
+    ]
+  },
+    {
+      "txt": "Message with new attachment",
+      "fmt":[{"at":0,"len":8,"tp":"EM"},{"at":17,"len":10,"tp":"ST"}],
+      "attachments": [
+        {
+          "height": 213,
+          "mime": "image/jpeg",
+          "name": "roses.jpg",
+          "val": "<38992, bytes: 123456789012345678901234567890123456789012345678901234567890>",
+          "width": 638
+        },
+        {
+          "height": 213,
+          "mime": "image1/jpeg",
+          "name": "roses.jpg",
+          "val": "<38992, bytes: 123456789012345678901234567890123456789012345678901234567890>",
+          "width": 638
+        }
+      ]
+    },
+  ],
 ];
 
 test.each(forward_this)('Drafty.forwardedContent %j', (src,exp) => {
@@ -403,6 +455,33 @@ const preview_this = [
       "txt":"➦  This is a reply to re…"
     }
   ],
+  [
+    {
+      "ent":[{"data":{"val":"usrCPvFc6lpAsw"},"tp":"MN"}],
+      "fmt":[{"len":13},{"at":13,"len":1,"tp":"BR"},{"len":38,"tp":"QQ"}],
+      "txt":"Alice Johnson This is a reply to replyThis is a Reply -> Forward -> Reply.",
+      "attachments": [
+        {
+          "height": 213,
+          "mime": "image/jpeg",
+          "name": "roses.jpg",
+          "val": "<38992, bytes: 123456789012345678901234567890123456789012345678901234567890>",
+          "width": 638
+        },
+        {
+          "height": 213,
+          "mime": "image1/jpeg",
+          "name": "roses.jpg",
+          "val": "<38992, bytes: 123456789012345678901234567890123456789012345678901234567890>",
+          "width": 638
+        }
+      ],
+    },
+    {
+      "fmt":[{"at":0,"len":1,"tp":"QQ"}],
+      "txt":" This is a Reply -> Forw…"
+    },
+  ],
 ];
 
 test.each(preview_this)('Drafty.preview %j', (src,exp) => {
@@ -410,6 +489,7 @@ test.each(preview_this)('Drafty.preview %j', (src,exp) => {
 });
 
 // Drafty docs for testing Drafty.replyContent.
+// todo add remove inline image in ent case
 const reply_this = [
   [
     {
@@ -467,6 +547,17 @@ const reply_this = [
       "ent":[{"tp":"IM","data":{"height":213,"mime":"image/jpeg","name":"roses.jpg","val":"<38992, bytes: 123456789012345678901234567890123456789012345678901234567890>","width":638}}]
     },
   ],
+  [
+    {
+      "txt": "Message with new attachment",
+      "fmt":[{"at":0,"len":7,"tp":"ST"}],
+      "attachments": [{"height": 213,"mime": "image/jpeg","name": "roses.jpg","val": "<38992, bytes: 123456789012345678901234567890123456789012345678901234567890>", "width": 638}],
+    },
+    {
+      "txt": "Message with new attachm…",
+      "fmt":[{"at":0,"len":7,"tp":"ST"}],
+    }
+  ],
 ];
 
 test.each(reply_this)('Drafty.replyContent %j', (src,exp) => {
@@ -488,6 +579,15 @@ const format_this = [
       "ent":[{"data":{"val":"usrCPvFc6lpAsw"},"tp":"MN"},{"data":{"val":"usrCPvFc6lpAsw"},"tp":"MN"}],
       "fmt":[{"len":15},{"at":15,"len":1,"tp":"BR"},{"at":16,"key":1,"len":13},{"at":29,"len":1,"tp":"BR"},{"at":16,"len":36,"tp":"QQ"}],
       "txt":"➦ Alice Johnson Alice Johnson This is a simple replyThis is a reply to reply"
+    },
+    "<a href=\"#usrCPvFc6lpAsw\">➦ Alice Johnson</a><br/> <div><a href=\"#usrCPvFc6lpAsw\">Alice Johnson</a><br/> This is a simple reply</div>This is a reply to reply"
+  ],
+  [
+    {
+      "ent":[{"data":{"val":"usrCPvFc6lpAsw"},"tp":"MN"},{"data":{"val":"usrCPvFc6lpAsw"},"tp":"MN"}],
+      "fmt":[{"len":15},{"at":15,"len":1,"tp":"BR"},{"at":16,"key":1,"len":13},{"at":29,"len":1,"tp":"BR"},{"at":16,"len":36,"tp":"QQ"}],
+      "txt":"➦ Alice Johnson Alice Johnson This is a simple replyThis is a reply to reply",
+      "attachments": [{"height": 213,"mime": "image/jpeg","name": "roses.jpg","val": "<38992, bytes: 123456789012345678901234567890123456789012345678901234567890>", "width": 638}],
     },
     "<a href=\"#usrCPvFc6lpAsw\">➦ Alice Johnson</a><br/> <div><a href=\"#usrCPvFc6lpAsw\">Alice Johnson</a><br/> This is a simple reply</div>This is a reply to reply"
   ],
@@ -518,4 +618,31 @@ const invalid_this = [
 
 test.each(invalid_this)('Invalid Drafty %j', (src,exp) => {
   expect(Drafty.UNSAFE_toHTML(src)).toEqual(exp);
+});
+
+// Test for append documents.
+const append_this = [
+  [
+    {
+      "txt":"Url one, two",
+      "fmt":[{"at":9,"len":3,"key":0},{"at":4,"len":3,"key":1}],
+      "ent":[{"data":{"url":"http://tinode.co"},"tp":"LN"}, {"data":{"url":"http://example.com"},"tp":"LN"}]
+    },
+    {
+      "txt":"Url one, twoMessage with new attachment",
+      "fmt":[{"at":9,"len":3,"key":0},{"at":4,"len":3,"key":1}, {"at":12,"len":7,"tp":"ST"}],
+      "ent":[{"data":{"url":"http://tinode.co"},"tp":"LN"}, {"data":{"url":"http://example.com"},"tp":"LN"}],
+      "attachments": [{"height": 213,"mime": "image/jpeg","name": "roses.jpg","val": "<38992, bytes: 123456789012345678901234567890123456789012345678901234567890>", "width": 638}],
+    },
+  ],
+];
+
+const append_document = {
+      "txt": "Message with new attachment",
+      "fmt":[{"at":0,"len":7,"tp":"ST"}],
+      "attachments": [{"height": 213,"mime": "image/jpeg","name": "roses.jpg","val": "<38992, bytes: 123456789012345678901234567890123456789012345678901234567890>", "width": 638}],
+    };
+
+test.each(append_this)('Append Drafty %j', (src,exp) => {
+  expect(Drafty.append(src, append_document)).toEqual(exp);
 });
