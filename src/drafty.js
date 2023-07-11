@@ -773,15 +773,15 @@ Drafty.insertAttachment = function(content, attachmentDesc) {
     ex._tempPreview = attachmentDesc._tempPreview;
     ex._processing = true;
     attachmentDesc.urlPromise.then(
-        (url) => {
-          ex.ref = url;
-          ex._tempPreview = undefined;
-          ex._processing = undefined;
-        },
-        (err) => {
-          /* catch the error, otherwise it will appear in the console. */
-          ex._processing = undefined;
-        }
+      (url) => {
+        ex.ref = url;
+        ex._tempPreview = undefined;
+        ex._processing = undefined;
+      },
+      (err) => {
+        /* catch the error, otherwise it will appear in the console. */
+        ex._processing = undefined;
+      }
     );
   }
 
@@ -2269,6 +2269,9 @@ function lightEntity(tree, allow) {
 
 // Remove spaces and breaks on the left.
 function lTrim(tree) {
+  if (!tree) {
+    return null;
+  }
   if (tree.type == 'BR') {
     tree = null;
   } else if (tree.text) {
