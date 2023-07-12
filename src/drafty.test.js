@@ -327,22 +327,34 @@ const forward_this = [
         "tp": "IM"
       }]
     },
+    {},
+  ],
+  [{
+    "txt": " Message",
+    "fmt": [{"len": 1}, {"len": 8, "tp": "CE"}],
+    "ent": [{
+      "data": {
+        "height": 213,
+        "mime": "image1/jpeg",
+        "name": "roses.jpg",
+        "val": "<38992, bytes: 123456789012345678901234567890123456789012345678901234567890>",
+        "width": 638
+      },
+      "tp": "IM"
+    }]
+  },
     {
-      "txt": " ",
-      "fmt": [{
-        "at": 0,
-        "len": 1,
-        "key": 0
-      }],
+      "txt": " Message",
+      "fmt": [{"len": 1, "at": 0, "key": 0}, {"len": 8, "at": 0, "tp": "CE"}],
       "ent": [{
-        "tp": "IM",
         "data": {
           "height": 213,
-          "mime": "image/jpeg",
+          "mime": "image1/jpeg",
           "name": "roses.jpg",
           "val": "<38992, bytes: 123456789012345678901234567890123456789012345678901234567890>",
           "width": 638
-        }
+        },
+        "tp": "IM"
       }]
     },
   ],
@@ -541,11 +553,7 @@ const reply_this = [
       "fmt":[{"len":1}],
       "ent":[{"data":{"height":213,"mime":"image/jpeg","name":"roses.jpg","val":"<38992, bytes: 123456789012345678901234567890123456789012345678901234567890>","width":638},"tp":"IM"}]
     },
-    {
-      "txt":" ",
-      "fmt":[{"at":0,"len":1,"key":0}],
-      "ent":[{"tp":"IM","data":{"height":213,"mime":"image/jpeg","name":"roses.jpg","val":"<38992, bytes: 123456789012345678901234567890123456789012345678901234567890>","width":638}}]
-    },
+    {},
   ],
   [
     {
