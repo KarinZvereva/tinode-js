@@ -1411,7 +1411,7 @@ Drafty.toPlainText = function(content) {
  * @returns <code>true</code> is content is plain text, <code>false</code> otherwise.
  */
 Drafty.isPlainText = function(content) {
-  return typeof content == 'string' || !(content.fmt || content.ent);
+  return typeof content == 'string' || !(content.fmt || content.ent || content.attachments);
 }
 
 /**
