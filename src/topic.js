@@ -38,6 +38,7 @@ export class Topic {
    * @param {callback} callbacks.onMetaSub - Called for a single subscription record change.
    * @param {callback} callbacks.onSubsUpdated - Called after a batch of subscription changes have been recieved and cached.
    * @param {callback} callbacks.onDeleteTopic - Called after the topic is deleted.
+   * @param {callback} callbacks.onMessageSent - Called after the message is sent.
    * @param {callback} callbacls.onAllMessagesReceived - Called when all requested <code>{data}</code> messages have been recived.
    */
   constructor(name, callbacks) {
@@ -120,6 +121,7 @@ export class Topic {
       this.onTagsUpdated = callbacks.onTagsUpdated;
       this.onCredsUpdated = callbacks.onCredsUpdated;
       this.onDeleteTopic = callbacks.onDeleteTopic;
+      this.onMessageSent = callbacks.onMessageSent;
       this.onAllMessagesReceived = callbacks.onAllMessagesReceived;
     }
   }
@@ -354,6 +356,8 @@ export class Topic {
     return this._tinode.publishMessage(pub, attachments).then(ctrl => {
       pub._sending = false;
       pub.ts = ctrl.ts;
+      pub.id = ctrl.params.id;
+      if (this.onMessageSent) this.onMessageSent(pub);
       this.swapMessageId(pub, ctrl.params.seq);
       this._maybeUpdateMessageVersionsCache(pub);
       this._routeData(pub);

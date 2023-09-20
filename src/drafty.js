@@ -1065,6 +1065,41 @@ Drafty.appendLink = function(content, linkData) {
 }
 
 /**
+ * Append a media files total to a Drafty document.
+ *
+ * @param {Drafty} content - Drafty document to append  media files total to.
+ * @param {Object} mediaData - Media total info in format <code>{txt: 5, mime: 'file' | 'image' | 'video' | 'attachments'}</code>.
+ *
+ * @returns {Drafty} the same document as <code>content</code>.
+ */
+Drafty.appendMediaTotal = function(content, mediaData) {
+  content = content || {
+    txt: ''
+  };
+
+  content.ent = content.ent || [];
+  content.fmt = content.fmt || [];
+
+  content.fmt.push({
+    at: content.txt.length,
+    len: String(mediaData.txt).length,
+    key: content.ent.length
+  });
+  content.txt += mediaData.txt;
+
+  const ex = {
+    tp: 'MT',
+    data: {
+      size: mediaData.txt,
+      mime: mediaData.mime,
+    }
+  }
+  content.ent.push(ex);
+
+  return content;
+}
+
+/**
  * Append image to Drafty document.
  * @memberof Drafty
  * @static
@@ -1472,6 +1507,11 @@ Drafty.replyContent = function(original, limit) {
       node.text = ' ';
       delete node.type;
       delete node.children;
+    } else if (node.type == 'IM') {
+      // Remove root inline images
+      if (!node.parent || !node.parent.type) {
+        return null;
+      }
     }
     return node;
   }
