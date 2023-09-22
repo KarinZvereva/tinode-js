@@ -71,6 +71,17 @@ export default class MetaGetBuilder {
     return this.withData(undefined, this.topic._minSeq > 0 ? this.topic._minSeq : undefined, limit);
   }
   /**
+   * Add query parameters to fetch messages older.
+   * @memberof Tinode.MetaGetBuilder#
+   *
+   * @param {number=} limit - maximum number of messages to fetch.
+   *
+   * @returns {Tinode.MetaGetBuilder} <code>this</code> object.
+   */
+  withOlderData(limit) {
+    return this.withData(undefined, this.topic._maxSeq > 0 ? this.topic._maxSeq + limit + 1: limit + 1, limit);
+  }
+  /**
    * Add query parameters to fetch topic description if it's newer than the given timestamp.
    * @memberof Tinode.MetaGetBuilder#
    *

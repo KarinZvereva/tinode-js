@@ -527,6 +527,30 @@ export class Topic {
       });
   }
   /**
+   * Request more messages from the server
+   * @memberof Tinode.Topic#
+   *
+   * @param {number} limit number of messages to get
+   */
+  getMessagesPageBySeqAsc(limit) {
+    let query = this.startMetaQuery().withOlderData(limit);
+    return this._loadMessages(this._tinode._db, query.extract('data')).then(count => {
+      if (count == limit) {
+        return Promise.resolve({
+          topic: this.name,
+          code: 200,
+          params: {
+            count: count
+          }
+        });
+      }
+      limit -= count;
+      query = this.startMetaQuery().withOlderData(limit);
+      let promise = this.getMeta(query.build());
+      return promise;
+    });
+  }
+  /**
    * Update topic metadata.
    * @memberof Tinode.Topic#
    *
