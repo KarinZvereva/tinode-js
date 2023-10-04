@@ -2584,6 +2584,9 @@ Topic.prototype = {
         if (data && data.ref) {
           attachments.push(data.ref);
         }
+        if (data && data?.thumbnail) {
+          attachments.push(data.thumbnail);
+        }
       });
       if (attachments.length == 0) {
         attachments = null;

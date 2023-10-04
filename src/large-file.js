@@ -107,7 +107,7 @@ LargeFileHelper.prototype = {
 
       if (this.status >= 200 && this.status < 300) {
         if (instance.toResolve) {
-          instance.toResolve(pkt.ctrl.params.url);
+          instance.toResolve(pkt.ctrl.params);
         }
         if (instance.onSuccess) {
           instance.onSuccess(pkt.ctrl);
