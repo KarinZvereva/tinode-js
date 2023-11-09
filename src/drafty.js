@@ -64,7 +64,7 @@ const MAX_PREVIEW_DATA_SIZE = 64;
 const JSON_MIME_TYPE = 'application/json';
 const DRAFTY_MIME_TYPE = 'text/x-drafty';
 const ALLOWED_ENT_FIELDS = ['act', 'height', 'duration', 'incoming', 'mime', 'name', 'premime', 'preref', 'preview',
-  'ref', 'size', 'state', 'url', 'val', 'width'
+  'ref', 'size', 'state', 'url', 'val', 'width', 'thumbnail'
 ];
 
 // Regular expressions for parsing inline formats. Javascript does not support lookbehind,
@@ -1472,6 +1472,11 @@ Drafty.replyContent = function(original, limit) {
       node.text = ' ';
       delete node.type;
       delete node.children;
+    } else if (node.type == 'IM') {
+      // Remove root inline images
+      if (!node.parent || !node.parent.type) {
+        return null;
+      }
     }
     return node;
   }

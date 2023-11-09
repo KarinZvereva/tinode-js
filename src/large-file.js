@@ -113,7 +113,7 @@ export default class LargeFileHelper {
 
       if (this.status >= 200 && this.status < 300) {
         if (toResolve) {
-          toResolve(pkt.ctrl.params.url);
+          toResolve(pkt.ctrl.params);
         }
         if (onSuccess) {
           onSuccess(pkt.ctrl);
@@ -151,10 +151,19 @@ export default class LargeFileHelper {
     try {
       const form = new FormData();
       form.append('file', data);
-      form.set('id', this._tinode.getNextUniqueId());
-      if (avatarFor) {
-        form.set('topic', avatarFor);
+
+      if (form.set) {
+        form.set('id', this._tinode.getNextUniqueId());
+        if (avatarFor) {
+          form.set('topic', avatarFor);
+        }
+      } else {
+        form.append('id', this._tinode.getNextUniqueId());
+        if (avatarFor) {
+          form.append('topic', avatarFor);
+        }
       }
+
       xhr.send(form);
     } catch (err) {
       if (toReject) {
