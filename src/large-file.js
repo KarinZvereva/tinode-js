@@ -158,6 +158,7 @@ export default class LargeFileHelper {
           form.set('topic', avatarFor);
         }
       } else {
+        // react native FormData implements only 'append' api
         form.append('id', this._tinode.getNextUniqueId());
         if (avatarFor) {
           form.append('topic', avatarFor);

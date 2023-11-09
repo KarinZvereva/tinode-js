@@ -38,7 +38,7 @@ export class Topic {
    * @param {callback} callbacks.onMetaSub - Called for a single subscription record change.
    * @param {callback} callbacks.onSubsUpdated - Called after a batch of subscription changes have been recieved and cached.
    * @param {callback} callbacks.onDeleteTopic - Called after the topic is deleted.
-   * @param {callback} callbacls.onMessageSend - Called when message sent.
+   * @param {callback} callbacks.onMessageSent - Called after the message is sent.
    * @param {callback} callbacls.onAllMessagesReceived - Called when all requested <code>{data}</code> messages have been recived.
    */
   constructor(name, callbacks) {
@@ -121,7 +121,7 @@ export class Topic {
       this.onTagsUpdated = callbacks.onTagsUpdated;
       this.onCredsUpdated = callbacks.onCredsUpdated;
       this.onDeleteTopic = callbacks.onDeleteTopic;
-      this.onMessageSend = callbacks.onMessageSend;
+      this.onMessageSent = callbacks.onMessageSent;
       this.onAllMessagesReceived = callbacks.onAllMessagesReceived;
     }
   }
@@ -359,11 +359,8 @@ export class Topic {
     return this._tinode.publishMessage(pub, attachments).then(ctrl => {
       pub._sending = false;
       pub.ts = ctrl.ts;
-
-      if (this.onMessageSend) {
-        this.onMessageSend(pub);
-      }
-
+      pub.id = ctrl.params.id;
+      if (this.onMessageSent) this.onMessageSent(pub);
       this.swapMessageId(pub, ctrl.params.seq);
       this._maybeUpdateMessageVersionsCache(pub);
       this._routeData(pub);
@@ -531,6 +528,30 @@ export class Topic {
         }
         return promise;
       });
+  }
+  /**
+   * Request more messages from the server
+   * @memberof Tinode.Topic#
+   *
+   * @param {number} limit number of messages to get
+   */
+  getMessagesPageBySeqAsc(limit) {
+    let query = this.startMetaQuery().withOlderData(limit);
+    return this._loadMessages(this._tinode._db, query.extract('data')).then(count => {
+      if (count == limit) {
+        return Promise.resolve({
+          topic: this.name,
+          code: 200,
+          params: {
+            count: count
+          }
+        });
+      }
+      limit -= count;
+      query = this.startMetaQuery().withOlderData(limit);
+      let promise = this.getMeta(query.build());
+      return promise;
+    });
   }
   /**
    * Update topic metadata.
