@@ -1719,7 +1719,7 @@ export class Topic {
       case 'read':
         const user = this._users[info.from];
         if (user) {
-          user[info.what] = info.seq;
+          user[info.what] = Math.max(info.seq, user[info.what] || 0);
           if (user.recv < user.read) {
             user.recv = user.read;
           }
